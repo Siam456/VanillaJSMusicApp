@@ -53,6 +53,9 @@
     background: rgba(255, 255, 255, 0.2);
     border-radius: 15px;
 }
+#info{
+    color: #42ba96;
+}
     </style>
 </head>
 
@@ -99,7 +102,15 @@
 
 
             </div>
+            <div id='infoWrapper' style="text-align: center;">
+                <h1 id='info'></h1>
+                <span id ='imgx'></span>
+                <span id ='brx'></span>
+                <span id='previewx'></span>
+            </div>
+            <div id='modal'></div>
             <div id='name'>
+                
                 
             </div>
         </main>
@@ -142,27 +153,124 @@
             }
 
             const displaySongList = (data) => {
-                console.log(data)
-                var out = '';
-                data.forEach(element => {
-                    out += 
-                    `<div class="search-result col-md-8 mx-auto py-4">
-                        <div class="single-result row align-items-center my-3 p-3">
-                            <div class="col-md-9">
-                                <h3 class="lyrics-name">${element.title_short}</h3>
-                                <p class="author lead">Album by <span>${element.artist.name}</span></p>
-                            </div>
-                            <div class="col-md-3 text-md-right text-center">
-                                <a class="btn btn-success" href=${element.link}>Get Lyrics</a>
+                
+                data.forEach((element, i) => {
+                    
 
-                            </div>
-                        </div>
-                    </div>`
+                    const main = document.createElement('div');
+                    main.classList.add('search-result')
+                    main.classList.add('col-md-8')
+                    main.classList.add('mx-auto')
+                    main.classList.add('py-4');
+
+                    const subdiv = document.createElement('div');
+                    subdiv.classList.add('single-result')
+                    subdiv.classList.add('row')
+                    subdiv.classList.add('align-items-center')
+                    subdiv.classList.add('my-0');
+                    subdiv.classList.add('p-3');
+
+                    const subdivNew = document.createElement('div');
+                    subdivNew.classList.add('col-md-9');
+
+                    const name = document.createElement('h3');
+                    name.classList.add('lyrics-name');
+                    name.innerHTML= element.title;
+
+                    const artist = document.createElement('p');
+                    artist.classList.add('author');
+                    artist.classList.add('lead');
+                    artist.innerHTML= 'Album by '+ element.artist.name;
+
+                    subdivNew.appendChild(name);
+                    subdivNew.appendChild(artist);
+                    
+                    const btndiv = document.createElement('div');
+                    btndiv.classList.add('col-md-3');
+                    btndiv.classList.add('text-md-right');
+                    btndiv.classList.add('text-center');
+
+                    let btn = document.createElement("button");
+                    btn.innerHTML = "Get Lyrics";
+                    btn.name = "formBtn"; 
+                    btn.classList.add('btn');
+                    btn.classList.add('btn-success');
+
+                    //onclick
+                    btn.onclick = function () {
+                        //alert();
+
+                        const url = `https://api.lyrics.ovh/v1/${element.artist.name}/${element.title}`;
+                
+                        //const url = 'https://jsonplaceholder.typicode.com/posts'
+
+                        
+
+                        var out = '';
+                        
+                        fetch(url, {
+                            mode: 'cors',
+                            method: "get",
+                            headers: {
+                            'Content-Type': 'application/json',
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                        }).then(response => response.json())
+                        .then(body => {
+                            out = body.lyrics;
+                            console.log(out);
+                            if(out){
+                                var br = '';
+                                var img = '';
+                                var sound = '';
+
+                                br = document.createElement('br');
+
+                                img = document.createElement('img');
+                                img.src = element.artist.picture_medium;
+                                img.classList.add('my-3');
+
+                                sound      = document.createElement('audio');
+                                sound.id       = 'audio-player';
+                                sound.controls = 'controls';
+                                sound.src      = element.preview;
+                                sound.type     = 'audio/mpeg';
+
+                                const fd = document.createElement('div');
+                                
+                                document.getElementById('imgx').appendChild(img);
+                                document.getElementById('brx').appendChild(br);
+                                document.getElementById('previewx').appendChild(sound)
+                                
+                                
+                                document.getElementById('info').textContent = element.title + " - " + element.artist.name;
+                                document.getElementById('modal').textContent= out;
+                            } else{
+                                document.getElementById('modal').textContent= 'Lyrics not Found';
+                            }
+                            
+                            
+                        })
+                        .catch(err => console.log(err));
+                        
+                    };
+
+                    btndiv.appendChild(btn);
+
+                    
+
+                    subdiv.appendChild(subdivNew);
+                    subdiv.appendChild(btndiv);
+                    main.appendChild(subdiv);
+                    
+                    //main.appendChild(text);
+                    document.getElementById('name').appendChild(main)
 
                 });
                 
-                document.getElementById('name').innerHTML = out
+                //document.getElementById('name').innerHTML = out
             } 
+
     </script>
 
  
